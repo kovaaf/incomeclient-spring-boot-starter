@@ -1,7 +1,7 @@
 package org.company.service;
 
 import org.company.configuration.properties.IncomeClientProperties;
-import org.company.entity.Person;
+import org.company.dto.PersonIncomeDTO;
 import org.company.exceptions.NoPersonWithSuchIdException;
 import org.company.exceptions.NonValidExternalResourceOrEmptyException;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,19 +21,19 @@ public class IncomeClient {
 
     public double getIncome(long personId) {
         return getPersonList().stream()
-                .filter(p -> personId == p.getId())
+                .filter(p -> personId == p.id())
                 .findFirst()
-                .map(Person::getIncome)
+                .map(PersonIncomeDTO::income)
                 .orElseThrow(() -> new NoPersonWithSuchIdException(personId));
     }
 
-    private List<Person> getPersonList() {
+    private List<PersonIncomeDTO> getPersonList() {
         String url = incomeClientProperties.getUrl();
-        List<Person> personList = defaultRestTemplate.exchange(
+        List<PersonIncomeDTO> personList = defaultRestTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Person>>() {}).getBody();
+                new ParameterizedTypeReference<List<PersonIncomeDTO>>() {}).getBody();
 
         if (personList == null) {
             throw new NonValidExternalResourceOrEmptyException(url);
